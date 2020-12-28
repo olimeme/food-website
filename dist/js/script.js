@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     //menu items
     class MenuItem
     {
-        constructor(name,desc,price,imgurl,alt,parentSelector)
+        constructor(name,desc,price,imgurl,alt,parentSelector, ...classes)
         {
             this.name = name;
             this.desc = desc;
@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             this.img = imgurl;
             this.alt = alt;
             this.transfer = 27;
+            this.classes = classes;
             this.parent = document.querySelector(parentSelector);
             this.changeToUAH();
         }
@@ -163,16 +164,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
         render(){
             const element = document.createElement('div');
+            if(!this.classes.length)
+            {
+                this.classes = 'menu__item'
+                element.classList.add(this.classes);
+            }
+            else
+                this.classes.forEach(className => element.classList.add(className));
             element.innerHTML = `
-            <div class="menu__item">
-                <img src="${this.img}" alt="${this.alt}">
-                <h3 class="menu__item-subtitle">Меню "${this.name}"</h3>
-                <div class="menu__item-descr">${this.desc}</div>
-                <div class="menu__item-divider"></div>
-                <div class="menu__item-price">
-                    <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                </div>
+            <img src="${this.img}" alt="${this.alt}">
+            <h3 class="menu__item-subtitle">Меню "${this.name}"</h3>
+            <div class="menu__item-descr">${this.desc}</div>
+            <div class="menu__item-divider"></div>
+            <div class="menu__item-price">
+            <div class="menu__item-cost">Цена:</div>
+            <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
             </div>`;
             this.parent.append(element);
         }
@@ -184,7 +190,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         229,
         'img/tabs/vegy.jpg',
         'vegy',
-        '.menu .container'
+        '.menu .container',
     ).render();
     new MenuItem(
         'Премиум',
@@ -192,7 +198,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         550,
         'img/tabs/elite.jpg',
         'elite',
-        '.menu .container'
+        '.menu .container',
     ).render();
     new MenuItem(
         'Постное',
@@ -200,7 +206,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         430,
         'img/tabs/post.jpg',
         'post',
-        '.menu .container'
+        '.menu .container',
     ).render();
 
     //menu items
