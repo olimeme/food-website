@@ -99,12 +99,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     function CloseModal(){
         modal.classList.toggle('show');
+        modal.classList.toggle('fade-modal');
         document.body.style.overflow = '';
     }
 
     function OpenModal(){
         modal.classList.toggle('show');
+        modal.classList.toggle('fade-modal');
         document.body.style.overflow = 'hidden'; //Disables scrolling while in modal tab
+        clearInterval(modalTimerId);
     }
 
     modalTrigger.forEach(item =>{
@@ -125,5 +128,80 @@ document.addEventListener('DOMContentLoaded', ()=>{
         if(e.code == 'Escape' && modal.classList.contains('show'))
             CloseModal();
     });
+
+    const modalTimerId = setTimeout(OpenModal,15000);
+
+    function ShowModalByScroll(){
+        if(window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight)
+        {
+            OpenModal();
+            window.removeEventListener('scroll',ShowModalByScroll);
+        }
+    }
+
+    window.addEventListener('scroll',ShowModalByScroll);
     //modal
+
+    //menu items
+    class MenuItem
+    {
+        constructor(name,desc,price,imgurl,alt,parentSelector)
+        {
+            this.name = name;
+            this.desc = desc;
+            this.price = price;
+            this.img = imgurl;
+            this.alt = alt;
+            this.transfer = 27;
+            this.parent = document.querySelector(parentSelector);
+            this.changeToUAH();
+        }
+
+        changeToUAH(){
+            this.price *= this.transfer;
+        }
+
+        render(){
+            const element = document.createElement('div');
+            element.innerHTML = `
+            <div class="menu__item">
+                <img src="${this.img}" alt="${this.alt}">
+                <h3 class="menu__item-subtitle">Меню "${this.name}"</h3>
+                <div class="menu__item-descr">${this.desc}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                </div>
+            </div>`;
+            this.parent.append(element);
+        }
+    }
+
+    new MenuItem(
+        'FIT',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        229,
+        'img/tabs/vegy.jpg',
+        'vegy',
+        '.menu .container'
+    ).render();
+    new MenuItem(
+        'Премиум',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        550,
+        'img/tabs/elite.jpg',
+        'elite',
+        '.menu .container'
+    ).render();
+    new MenuItem(
+        'Постное',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков. ',
+        430,
+        'img/tabs/post.jpg',
+        'post',
+        '.menu .container'
+    ).render();
+
+    //menu items
 });
