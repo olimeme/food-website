@@ -143,17 +143,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
     //menu items
     class MenuItem
     {
-        constructor(name,desc,price,imgurl,alt,parentSelector, ...classes)
-        {
-            this.name = name;
-            this.desc = desc;
-            this.price = price;
-            this.img = imgurl;
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {
+            this.img = src;
             this.alt = alt;
-            this.transfer = 27;
+            this.name = title;
+            this.desc = descr;
+            this.price = price;
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
-            this.changeToUAH();
+            this.transfer = 27;
+            this.changeToUAH(); 
         }
 
         changeToUAH(){
@@ -162,50 +161,32 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
         render(){
             const element = document.createElement('div');
-            if(!this.classes.length)
-            {
+            if(!this.classes.length){
                 this.classes = 'menu__item'
                 element.classList.add(this.classes);
             }
-            else
+            else{
                 this.classes.forEach(className => element.classList.add(className));
+            }
             element.innerHTML = `
             <img src="${this.img}" alt="${this.alt}">
             <h3 class="menu__item-subtitle">Меню "${this.name}"</h3>
             <div class="menu__item-descr">${this.desc}</div>
             <div class="menu__item-divider"></div>
             <div class="menu__item-price">
-            <div class="menu__item-cost">Цена:</div>
-            <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                <div class="menu__item-cost">Цена:</div>
+                <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
             </div>`;
             this.parent.append(element);
         }
     }
-
-    new MenuItem(
-        'FIT',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        229,
-        'img/tabs/vegy.jpg',
-        'vegy',
-        '.menu .container',
-    ).render();
-    new MenuItem(
-        'Премиум',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        550,
-        'img/tabs/elite.jpg',
-        'elite',
-        '.menu .container',
-    ).render();
-    new MenuItem(
-        'Постное',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков. ',
-        430,
-        'img/tabs/post.jpg',
-        'post',
-        '.menu .container',
-    ).render();
+    
+    getResources('http://localhost:3000/menu')
+    .then(data =>{
+        data.forEach(({img,altimg,title,descr,price}) => {
+            new MenuItem(img,altimg,title,descr,price,'.menu .container').render();
+        });
+    });
     //menu items
 
     //Forms
@@ -231,6 +212,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
         });
         return await res.json();
     };
+
+    async function getResources(url) {
+        let res = await fetch(url);
+    
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+        }
+    
+        return await res.json();
+    }
+
+
 
     function bindPostData(form) {
         form.addEventListener('submit', (e) => {
@@ -288,4 +281,44 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     //forms
 
+    //slider
+    const slides = document.querySelectorAll('.offer__slide');
+    const prev = document.querySelector('.offer__slider-prev');
+    const next = document.querySelector('.offer__slider-next');
+    const current = document.querySelector('#current');
+    const total = document.querySelector('#total');
+
+    let slideIndex = 1;
+
+    showSlides(slideIndex);
+
+    function showSlides(n){
+        if(n > slides.length)
+            slideIndex = 1;
+
+        if(n < 1)
+            slideIndex = slides.length;
+
+        slides.forEach(item => item.style.display = 'none');
+
+        slides[slideIndex - 1].style.display = 'block';
+
+        total.textContent = `0${slides.length}`;
+
+        if(slideIndex >= 10)
+            current.textContent = slideIndex;
+        else
+            current.textContent = `0${slideIndex}`;
+    }
+
+    function plusSlides(n){
+        showSlides(slideIndex+=n);
+    }
+
+    prev.addEventListener('click',()=>{
+        plusSlides(-1);
+    });
+    next.addEventListener('click',()=>{
+        plusSlides(1);
+    });
 });
